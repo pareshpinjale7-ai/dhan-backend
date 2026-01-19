@@ -1,0 +1,6 @@
+module.exports = {
+  RELIANCE: "2885",
+  TCS: "11536",
+  INFY: "1594",
+  HDFCBANK: "1333"
+};
