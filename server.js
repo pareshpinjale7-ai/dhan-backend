@@ -7,16 +7,10 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// ===============================
-// BASIC CONFIG
-// ===============================
 const DHAN_BASE_URL = "https://api.dhan.co";
 const DHAN_TOKEN = process.env.DHAN_TOKEN;
 
-// ===============================
-// SYMBOL → SECURITY ID MAP
-// (आत्ता sample आहेत – पुढे full F&O टाकू)
-// ===============================
+// SYMBOL → SECURITY ID (sample)
 const SYMBOLS = {
   RELIANCE: "2885",
   TCS: "11536",
@@ -26,33 +20,30 @@ const SYMBOLS = {
   SBIN: "3045"
 };
 
-// ===============================
-// ROOT TEST API
-// ===============================
+// ROOT CHECK
 app.get("/", (req, res) => {
   res.send("Dhan Backend Working ✅");
 });
 
-// ===============================
-// PRICE API (SYMBOL BASED)
-// ===============================
+// ✅ PRICE API – FINAL FIX
 app.get("/api/price/:symbol", async (req, res) => {
   try {
     const symbol = req.params.symbol.toUpperCase();
     const security_id = SYMBOLS[symbol];
 
     if (!security_id) {
-      return res.status(400).json({
-        error: "Symbol not found",
-        message: "Security ID mapping missing"
-      });
+      return res.json({ error: "Symbol not mapped" });
     }
 
     const response = await axios.post(
       `${DHAN_BASE_URL}/marketdata/quote`,
       {
-        security_id: security_id,
-        exchange_segment: "NSE_EQ"
+        instruments: [
+          {
+            security_id: security_id,
+            exchange_segment: "NSE_EQ"
+          }
+        ]
       },
       {
         headers: {
@@ -63,24 +54,22 @@ app.get("/api/price/:symbol", async (req, res) => {
     );
 
     res.json({
-      symbol: symbol,
-      security_id: security_id,
-      data: response.data
+      symbol,
+      security_id,
+      price_data: response.data
     });
 
-  } catch (error) {
-    console.error(error.message);
+  } catch (err) {
+    console.error(err.response?.data || err.message);
     res.status(500).json({
-      error: "Dhan API Error",
-      message: "Failed to fetch price"
+      error: "PRICE API FAILED",
+      detail: err.response?.data || err.message
     });
   }
 });
 
-// ===============================
-// SERVER START (RENDER SAFE)
-// ===============================
+// RENDER SAFE PORT
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log("Server running on port", PORT);
 });
