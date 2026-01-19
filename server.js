@@ -7,8 +7,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// ✅ DHAN V2 BASE
-const DHAN_BASE_URL = "https://api.dhan.co/v2";
+const DHAN_BASE_URL = "https://api.dhan.co";
 const DHAN_TOKEN = process.env.DHAN_TOKEN;
 
 // SYMBOL → SECURITY ID (sample)
@@ -26,18 +25,18 @@ app.get("/", (req, res) => {
   res.send("Dhan Backend Working ✅");
 });
 
-// ✅ PRICE API (100% CORRECT)
+// ✅ PRICE API – FINAL & CORRECT
 app.get("/api/price/:symbol", async (req, res) => {
   try {
     const symbol = req.params.symbol.toUpperCase();
     const security_id = SYMBOLS[symbol];
 
     if (!security_id) {
-      return res.status(400).json({ error: "Symbol not mapped" });
+      return res.json({ error: "Symbol not mapped" });
     }
 
     const response = await axios.post(
-      `${DHAN_BASE_URL}/marketdata/quote`,
+      `${DHAN_BASE_URL}/marketdata/quotes`,
       {
         instruments: [
           {
@@ -57,7 +56,7 @@ app.get("/api/price/:symbol", async (req, res) => {
     res.json({
       symbol,
       security_id,
-      dhan_response: response.data
+      data: response.data
     });
 
   } catch (err) {
