@@ -25,7 +25,7 @@ app.get("/", (req, res) => {
   res.send("Dhan Backend Working ✅");
 });
 
-// ✅ PRICE API – FINAL FIX
+// ✅ PRICE API – FINAL & CORRECT
 app.get("/api/price/:symbol", async (req, res) => {
   try {
     const symbol = req.params.symbol.toUpperCase();
@@ -36,7 +36,7 @@ app.get("/api/price/:symbol", async (req, res) => {
     }
 
     const response = await axios.post(
-      `${DHAN_BASE_URL}/marketdata/quote`,
+      `${DHAN_BASE_URL}/marketdata/quotes`,
       {
         instruments: [
           {
@@ -56,7 +56,7 @@ app.get("/api/price/:symbol", async (req, res) => {
     res.json({
       symbol,
       security_id,
-      price_data: response.data
+      data: response.data
     });
 
   } catch (err) {
