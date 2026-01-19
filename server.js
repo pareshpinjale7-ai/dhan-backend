@@ -19,12 +19,12 @@ const SYMBOLS = {
   SBIN: "3045"
 };
 
-// ROOT CHECK
+// ROOT
 app.get("/", (req, res) => {
   res.send("Dhan Backend Working ✅");
 });
 
-// ✅ PRICE API (LTP – ONLY VALID ONE)
+// ✅ LTP API – HEADER FIXED
 app.get("/api/price/:symbol", async (req, res) => {
   try {
     const symbol = req.params.symbol.toUpperCase();
@@ -46,7 +46,7 @@ app.get("/api/price/:symbol", async (req, res) => {
       },
       {
         headers: {
-          "access-token": DHAN_TOKEN,
+          "accessToken": DHAN_TOKEN,   // 🔥 IMPORTANT FIX
           "Content-Type": "application/json"
         }
       }
@@ -55,11 +55,10 @@ app.get("/api/price/:symbol", async (req, res) => {
     res.json({
       symbol,
       security_id,
-      ltp_data: response.data
+      dhan_data: response.data
     });
 
   } catch (err) {
-    console.error(err.response?.data || err.message);
     res.status(500).json({
       error: "LTP API FAILED",
       detail: err.response?.data || err.message
@@ -67,7 +66,6 @@ app.get("/api/price/:symbol", async (req, res) => {
   }
 });
 
-// RENDER SAFE PORT
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log("Server running on port", PORT);
