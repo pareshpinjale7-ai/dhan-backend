@@ -7,10 +7,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const DHAN_BASE_URL = "https://api.dhan.co";
 const DHAN_TOKEN = process.env.DHAN_TOKEN;
 
-// SYMBOL → SECURITY ID (sample)
+// SYMBOL → SECURITY ID
 const SYMBOLS = {
   RELIANCE: "2885",
   TCS: "11536",
@@ -25,18 +24,18 @@ app.get("/", (req, res) => {
   res.send("Dhan Backend Working ✅");
 });
 
-// ✅ PRICE API – FINAL & CORRECT
+// ✅ PRICE API (LTP – ONLY VALID ONE)
 app.get("/api/price/:symbol", async (req, res) => {
   try {
     const symbol = req.params.symbol.toUpperCase();
     const security_id = SYMBOLS[symbol];
 
     if (!security_id) {
-      return res.json({ error: "Symbol not mapped" });
+      return res.status(400).json({ error: "Symbol not mapped" });
     }
 
     const response = await axios.post(
-      `${DHAN_BASE_URL}/marketdata/quotes`,
+      "https://api.dhan.co/marketdata/ltp",
       {
         instruments: [
           {
@@ -56,13 +55,13 @@ app.get("/api/price/:symbol", async (req, res) => {
     res.json({
       symbol,
       security_id,
-      data: response.data
+      ltp_data: response.data
     });
 
   } catch (err) {
     console.error(err.response?.data || err.message);
     res.status(500).json({
-      error: "PRICE API FAILED",
+      error: "LTP API FAILED",
       detail: err.response?.data || err.message
     });
   }
