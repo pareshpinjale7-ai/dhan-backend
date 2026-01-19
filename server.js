@@ -17,32 +17,7 @@ app.get("/", (req, res) => {
 // LIVE PRICE API
 app.get("/api/price/:symbol", async (req, res) => {
   try {
-    const symbol = req.params.symbol;
-
-    const response = await axios.post(
-      `${DHAN_API}/marketdata/quote`,
-      {
-        security_id: symbol,
-        exchange_segment: "NSE_EQ"
-      },
-      {
-        headers: {
-          "access-token": TOKEN,
-          "Content-Type": "application/json"
-        }
-      }
-    );
-
-    res.json(response.data);
-  } catch (e) {
-    res.json({ error: "Data not found" });
-  }
-});
-
-app.listen(5000, () => {
-  console.log("Server running on port 5000");
-});
-const symbols = require("./symbols");
+    const symbols = require("./symbols");
 
 app.get("/api/price/:symbol", async (req, res) => {
   try {
@@ -72,3 +47,4 @@ app.get("/api/price/:symbol", async (req, res) => {
     res.json({ error: "Dhan API error" });
   }
 });
+
