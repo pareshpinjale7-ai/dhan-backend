@@ -7,6 +7,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+const DHAN_BASE = "https://api.dhan.co/v2";
 const DHAN_TOKEN = process.env.DHAN_TOKEN;
 
 // SYMBOL → SECURITY ID
@@ -24,7 +25,7 @@ app.get("/", (req, res) => {
   res.send("Dhan Backend Working ✅");
 });
 
-// ✅ LTP API – HEADER FIXED
+// ✅ LTP API – FINAL VERIFIED
 app.get("/api/price/:symbol", async (req, res) => {
   try {
     const symbol = req.params.symbol.toUpperCase();
@@ -35,7 +36,7 @@ app.get("/api/price/:symbol", async (req, res) => {
     }
 
     const response = await axios.post(
-      "https://api.dhan.co/marketdata/ltp",
+      `${DHAN_BASE}/marketdata/ltp`,
       {
         instruments: [
           {
@@ -46,7 +47,7 @@ app.get("/api/price/:symbol", async (req, res) => {
       },
       {
         headers: {
-          "accessToken": DHAN_TOKEN,   // 🔥 IMPORTANT FIX
+          "access-token": DHAN_TOKEN,
           "Content-Type": "application/json"
         }
       }
@@ -55,7 +56,7 @@ app.get("/api/price/:symbol", async (req, res) => {
     res.json({
       symbol,
       security_id,
-      dhan_data: response.data
+      ltp: response.data
     });
 
   } catch (err) {
